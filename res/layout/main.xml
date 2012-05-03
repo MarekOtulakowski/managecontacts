@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="1">
+
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/appversion" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/author" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/website" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/empthy" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <Button 
+      android:layout_column="1"
+      android:text="@string/btnExport" 
+      android:id="@+id/button_ExpContacs" 
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content" />   
+    </TableRow>
+    <TableRow>
+     <Button 
+      android:layout_column="1"
+      android:text="@string/btnImport" 
+      android:id="@+id/button_ImpContacs" 
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content" />   
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/empthy" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:id="@+id/TextView_InfoAboutSpinner"
+      android:text="@string/infoAboutSpinner" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <Spinner
+      android:layout_column="1"
+      android:id="@+id/spinner_kindOfContact"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:id="@+id/TextView_Result"
+      android:text="@string/resultNull" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/empthy"
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/empthy" 
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <TextView 
+      android:layout_column="1"
+      android:text="@string/empthy"
+      android:gravity="center_horizontal"
+      android:padding="3dip" />
+    </TableRow>
+    <TableRow>
+     <Button 
+      android:layout_column="1"
+      android:text="@string/btnClose"
+      android:id="@+id/button_CloseApplication" 
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content" />   
+    </TableRow>
+</TableLayout>
