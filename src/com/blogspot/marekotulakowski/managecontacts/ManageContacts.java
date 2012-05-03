@@ -1,12 +1,16 @@
 /*
- * build 001
+ * build 002
  */
 package com.blogspot.marekotulakowski.managecontacts;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -52,8 +56,8 @@ public class ManageContacts extends Activity {
         });
         
         //set properties
-        String[] spinnerItems = new String[] {"CVS", 
-        		                       		  "VCF"};
+        String[] spinnerItems = new String[] {"CVS",
+        									  "VCF"};
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, 
         		                              android.R.layout.simple_spinner_item, 
         		                              spinnerItems);
@@ -87,4 +91,29 @@ public class ManageContacts extends Activity {
             }
         }
     };
+    
+    public Cursor getContactsFromAndroid() {  
+        Uri uri = ContactsContract.Contacts.CONTENT_URI;  
+        String[] projection = new String[] {  
+                ContactsContract.Contacts._ID,  
+                ContactsContract.Contacts.DISPLAY_NAME  
+        };  
+        String selection = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '1'";   
+        //1 invisible  
+        //0 visible  
+          
+        String[] selectionArgs = null;  
+        String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";  
+  
+        return managedQuery(uri, projection, selection, selectionArgs, sortOrder);  
+    }  
+    
+    public Cursor getContactsFromSIMcard() {  
+    	String simUrl = "content://icc/adn";  
+    	Intent intent = new Intent();  
+    	intent.setData(Uri.parse(simUrl));  
+    	Uri uri = intent.getData();  
+    	Cursor mCursor = this.getContentResolver().query(uri, null, null, null, null);  
+    	return mCursor;  
+   }  
 }
