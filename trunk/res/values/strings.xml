@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- build 007 -->
+<!-- build 008 -->
 <resources>
 
     <string name="hello">Hello World, ManageContactsActivity!</string>
     <string name="app_name">ManageContacts</string>
     
     <string name="appversion">Manage contacts v.1.0.0</string>
-    <string name="author">written by: Marek Otulakowski</string>
-    <string name="website">http://marekotulakowski.blogspot.com</string>
+    <string name="website">http://code.google.com/p/managecontacts</string>
     <string name="empthy"></string>
     <string name="btnImport">Import all contacts from sdcard</string>
     <string name="btnExport">Export all contacts to sdcard</string>
     <string name="btnClose">Close Manage Contacts Application</string>
     <string name="resultNull">Result: null</string>
     <string name="infoAboutSpinner">Import/Export file type:</string>
+    <string name="infoAboutContactSource">(Export) Type of source:</string>
 
 </resources>

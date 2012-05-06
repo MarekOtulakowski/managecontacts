@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- build 007 -->
+<!-- build 008 -->
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -15,21 +15,7 @@
     <TableRow>
      <TextView 
       android:layout_column="1"
-      android:text="@string/author" 
-      android:gravity="center_horizontal"
-      android:padding="3dip" />
-    </TableRow>
-    <TableRow>
-     <TextView 
-      android:layout_column="1"
       android:text="@string/website" 
-      android:gravity="center_horizontal"
-      android:padding="3dip" />
-    </TableRow>
-    <TableRow>
-     <TextView 
-      android:layout_column="1"
-      android:text="@string/empthy" 
       android:gravity="center_horizontal"
       android:padding="3dip" />
     </TableRow>
@@ -59,7 +45,7 @@
     <TableRow>
      <TextView 
       android:layout_column="1"
-      android:id="@+id/TextView_InfoAboutSpinner"
+      android:id="@+id/textView_InfoAboutSpinner"
       android:text="@string/infoAboutSpinner" 
       android:gravity="center_horizontal"
       android:padding="3dip" />
@@ -74,15 +60,23 @@
     <TableRow>
      <TextView 
       android:layout_column="1"
-      android:id="@+id/TextView_Result"
-      android:text="@string/resultNull" 
+      android:id="@+id/textView_InfoAboutContactSource"
+      android:text="@string/infoAboutContactSource" 
       android:gravity="center_horizontal"
       android:padding="3dip" />
     </TableRow>
     <TableRow>
+     <Spinner
+      android:layout_column="1"
+      android:id="@+id/spinner_contactSource"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+    </TableRow>
+    <TableRow>
      <TextView 
       android:layout_column="1"
-      android:text="@string/empthy"
+      android:id="@+id/textView_Result"
+      android:text="@string/resultNull" 
       android:gravity="center_horizontal"
       android:padding="3dip" />
     </TableRow>

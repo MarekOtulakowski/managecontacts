@@ -1,5 +1,5 @@
 /*
- * build 007
+ * build 008
  */
 package com.blogspot.marekotulakowski.managecontacts;
 
@@ -30,14 +30,16 @@ public class ManageContacts extends Activity {
 	private Button Button_Export;  
 	private Button Button_Close;  
 	private Spinner Spinner_KindOfContacts;
+	private Spinner Spinner_ContactSource;
 	private TextView TextView_Result;
-	private Cursor cContactsFromAndroid;  
-	private Cursor cContactsFromSIM;  
-	private ArrayList<Contact> arContacts;  
-	private Contact newContact; 
-	private String sFileNamePrefix = "ExportContacts";
-	private String sFileNameSurfix = ".cvs";
-	private Boolean IsCsvFormat = true;
+	private Cursor cursor_ContactsFromAndroid;  
+	private Cursor cursor_ContactsFromSIM;  
+	private ArrayList<Contact> arrayList_Contacts;  
+	private Contact contact; 
+	private String string_FileNamePrefix = "ExportContacts";
+	private String string_FileNameSurfix = ".cvs";
+	private Boolean bool_IsCsvFormat = true;
+	private Integer int_ContactSourceType = 0;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,50 +51,62 @@ public class ManageContacts extends Activity {
         this.Button_Export = (Button)this.findViewById(R.id.button_ExpContacs);
         this.Button_Close = (Button)this.findViewById(R.id.button_CloseApplication);
         this.Spinner_KindOfContacts = (Spinner)this.findViewById(R.id.spinner_kindOfContact);
-        this.TextView_Result = (TextView)this.findViewById(R.id.TextView_Result);
+        this.TextView_Result = (TextView)this.findViewById(R.id.textView_Result);
+        this.Spinner_ContactSource = (Spinner)this.findViewById(R.id.spinner_contactSource);
         
         //assign events
         this.Button_Import.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	ShowDialog("clicked import button!\nNot implemed function, yet!");
+            	showDialog("clicked import button!\nNot implemed function, yet!");
             }
         });
         this.Button_Export.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {     
             	
             	//user choose output format
-            	if (Spinner_KindOfContacts.getSelectedItemPosition() == 0) {
-            		IsCsvFormat = true; //CSV, default value
-            	} else if (Spinner_KindOfContacts.getSelectedItemPosition() == 1) {
-            		IsCsvFormat = false; //VCF
+            	if (Spinner_KindOfContacts.getSelectedItemPosition() == 0) {            		
+            		//CSV, default value
+            		bool_IsCsvFormat = true;             		
+            	} else if (Spinner_KindOfContacts.getSelectedItemPosition() == 1) {            		
+            		//VCF
+            		bool_IsCsvFormat = false;             		
             	} 
             	
+            	//user choose type of contact
+            	if (Spinner_ContactSource.getSelectedItemPosition() == 0) {            		
+            		//0 only Android Contacts
+            		int_ContactSourceType = 0;            		
+            	} else if (Spinner_ContactSource.getSelectedItemPosition() == 1) {            		
+            		//1 only SIM Card Contacts
+            		int_ContactSourceType = 1;            		
+            	} else if (Spinner_ContactSource.getSelectedItemPosition() == 2) {            		
+            		//2 both Android and SIM Card Contacts
+            		int_ContactSourceType = 2;            		
+            	}            
+            	
             	//run selected function
-            	if (IsCsvFormat) {
-            		
-            		try {
-            			writeContactsToSdCard(SourceContact.SIMandAndroid);
+            	if (bool_IsCsvFormat) {            		
+            		try {       
+            			writeContacts();
             		}
-            		catch (Exception e) {
+            		catch (Exception e) {            			
             			TextView_Result.setText("Export to CVS unsuccessfully completed!");
-            			ShowDialog("Error export, detail:\n" + e.getMessage());
+            			showDialog("Error export, detail:\n" + e.getMessage());            			
             		}
-
-            	} else {
-            		
-            		try {
-            			writeContactsToSdCard(SourceContact.SIMandAndroid);
+            	} else {            		
+            		try {            			
+            			writeContacts();         			
             		}
-            		catch (Exception e) {
+            		catch (Exception e) {            			
             			TextView_Result.setText("Export to VCF unsuccessfully completed!");
-            			ShowDialog("Error export, detail:\n" + e.getMessage());
+            			showDialog("Error export, detail:\n" + e.getMessage());            			
             		}
             	}
             }
         });
         this.Button_Close.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	ShowQuestionCloseApp("Are you sure, close this application?");
+            	showQuestionCloseApp("Are you sure, close this application?");
             }
         });
         
@@ -104,14 +118,33 @@ public class ManageContacts extends Activity {
 												  spinnerItems);
 	    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    Spinner_KindOfContacts.setAdapter(spinnerAdapter);
+	    
+	    String[] spinnerItemsContactSource = new String[] {"Only Android Contact",
+	    		        								   "Only SIM Card Contact",
+	    		        								   "Both Android and SIM Contact"};
+ArrayAdapter<String> spinnerAdapterContactSource = new ArrayAdapter<String>(this, 
+												  android.R.layout.simple_spinner_item, 
+												  spinnerItemsContactSource);
+		spinnerAdapterContactSource.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		Spinner_ContactSource.setAdapter(spinnerAdapterContactSource);
     }
     
-    public void ShowDialog(String message) {  
+    private void writeContacts() {
+		if (int_ContactSourceType == 0) {
+			writeContactsToSdCard(SourceContact.AndroidContact);    
+		} else if (int_ContactSourceType == 1) {
+			writeContactsToSdCard(SourceContact.SIMcardContact);
+		} else if (int_ContactSourceType == 2) {
+			writeContactsToSdCard(SourceContact.SIMandAndroid);
+		}   	
+    }
+    
+    private void showDialog(String message) {  
     	new AlertDialog.Builder(this).setTitle("Program Info").setMessage(message).
     	setIcon(android.R.drawable.ic_dialog_info).setPositiveButton("OK", null).show();  
     }  
     
-    public void ShowQuestionCloseApp(String questionMessage) {
+    private void showQuestionCloseApp(String questionMessage) {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	builder.setTitle("Program Question").setMessage(questionMessage)
 			   .setPositiveButton("Yes", showDialogQuestionListener)
@@ -133,7 +166,7 @@ public class ManageContacts extends Activity {
         }
     };
     
-    public Cursor getContactsFromAndroid() {  
+    private Cursor getContactsFromAndroid() {  
         Uri uri = ContactsContract.Contacts.CONTENT_URI;  
         String[] projection = new String[] {  
 								  ContactsContract.Contacts._ID,  
@@ -153,7 +186,7 @@ public class ManageContacts extends Activity {
 							sortOrder);  
     }  
     
-    public Cursor getContactsFromSIMcard() {  
+    private Cursor getContactsFromSIMcard() {  
     	String simUrl = "content://icc/adn";  
     	Intent intent = new Intent();  
     	intent.setData(Uri.parse(simUrl));  
@@ -164,18 +197,18 @@ public class ManageContacts extends Activity {
 														 null, 
 														 null);  
     	return mCursor;  
-   }  
+    }  
     
-    public ArrayList<Contact> getArrayListContactsFromAndroid() {  
+    private ArrayList<Contact> getArrayListContactsFromAndroid() {  
         ArrayList<Contact> arContactFromAndroid = new ArrayList<Contact>();  
         int iContactsCountFromAndroid = getContactsFromAndroid().getCount();  
-        cContactsFromAndroid = getContactsFromAndroid();  
+        cursor_ContactsFromAndroid = getContactsFromAndroid();  
           
-        if (cContactsFromAndroid.moveToFirst()) {  
+        if (cursor_ContactsFromAndroid.moveToFirst()) {  
 	        String contactId, phoneNumber, contactName  = "";  
 	        while (iContactsCountFromAndroid > 0) {  
 				contactId = phoneNumber = contactName = "";  
-				contactId = cContactsFromAndroid.getString(cContactsFromAndroid.getColumnIndex(   
+				contactId = cursor_ContactsFromAndroid.getString(cursor_ContactsFromAndroid.getColumnIndex(   
 														   ContactsContract.Contacts._ID));  
 					
 				Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
@@ -188,72 +221,72 @@ public class ManageContacts extends Activity {
 				}   
 				phones.close();  
 					 
-				contactName = cContactsFromAndroid.getString(cContactsFromAndroid.getColumnIndex(  
+				contactName = cursor_ContactsFromAndroid.getString(cursor_ContactsFromAndroid.getColumnIndex(  
 															 ContactsContract.Contacts.DISPLAY_NAME));  
 					
-				newContact = new Contact(contactName, 
+				contact = new Contact(contactName, 
 										 phoneNumber, 
 										 TypeContact.ContactFromAndroid);  
-				arContactFromAndroid.add(newContact);  
-				newContact = null;  
+				arContactFromAndroid.add(contact);  
+				contact = null;  
 					
 				iContactsCountFromAndroid--;  
-				cContactsFromAndroid.moveToNext();  
+				cursor_ContactsFromAndroid.moveToNext();  
 	        }  
         }  
-        cContactsFromAndroid.close();       
+        cursor_ContactsFromAndroid.close();       
           
         return arContactFromAndroid;  
     }  
      
-	public ArrayList<Contact> getArrayListContactsFromSIM() {  
+    private ArrayList<Contact> getArrayListContactsFromSIM() {  
 		ArrayList<Contact> arContactFromSIM = new ArrayList<Contact>();  
 		int iCountContactFromSIMcard = getContactsFromSIMcard().getCount();  
-		cContactsFromSIM = getContactsFromSIMcard();  
+		cursor_ContactsFromSIM = getContactsFromSIMcard();  
 	  
-		if (cContactsFromSIM.moveToFirst()) {       
+		if (cursor_ContactsFromSIM.moveToFirst()) {       
 			 String contactName, phoneNumber = "";  
 			 while (iCountContactFromSIMcard  > 0) {  
 				contactName = phoneNumber = "";  
 					
-				contactName = cContactsFromSIM.getString(0);  
-				phoneNumber = cContactsFromSIM.getString(1);  
+				contactName = cursor_ContactsFromSIM.getString(0);  
+				phoneNumber = cursor_ContactsFromSIM.getString(1);  
 				// 0 - name  
 				// 1 - number  
 				// 2 - email  
 				// 3 - _id  
 					
-				newContact = new Contact(contactName, phoneNumber, TypeContact.ContactFromSIMcard);  
-				arContactFromSIM.add(newContact);  
-				newContact = null;  
+				contact = new Contact(contactName, phoneNumber, TypeContact.ContactFromSIMcard);  
+				arContactFromSIM.add(contact);  
+				contact = null;  
 					
 				iCountContactFromSIMcard--;  
-				cContactsFromSIM.moveToNext();  
+				cursor_ContactsFromSIM.moveToNext();  
 			}  
 		}  
-		cContactsFromSIM.close();   
+		cursor_ContactsFromSIM.close();   
 		  
 		return arContactFromSIM;  
 	}  
 	
-	public void writeContactsToSdCard(SourceContact sourceContact) { 
-		arContacts = new ArrayList<Contact>();
+    private void writeContactsToSdCard(SourceContact sourceContact) { 
+		arrayList_Contacts = new ArrayList<Contact>();
 		  
 		switch (sourceContact) {
 			case SIMcardContact: {
-				arContacts.addAll(getArrayListContactsFromSIM());    
+				arrayList_Contacts.addAll(getArrayListContactsFromSIM());    
 			}
 			case AndroidContact: {
-				arContacts.addAll(getArrayListContactsFromAndroid());
+				arrayList_Contacts.addAll(getArrayListContactsFromAndroid());
 			}
 			case SIMandAndroid: {
-				arContacts.addAll(getArrayListContactsFromSIM());
-				arContacts.addAll(getArrayListContactsFromAndroid());
+				arrayList_Contacts.addAll(getArrayListContactsFromSIM());
+				arrayList_Contacts.addAll(getArrayListContactsFromAndroid());
 			}
 		}
 		  
-		if (arContacts.size() < 1) {
-			ShowDialog("Not found any contacts on SIM and Android, exit");
+		if (arrayList_Contacts.size() < 1) {
+			showDialog("Not found any contacts on SIM and Android, exit");
 			return;
 		}
 			 
@@ -265,13 +298,13 @@ public class ManageContacts extends Activity {
 			dir.mkdirs();
 		}
 		
-		if (IsCsvFormat) { //CVS format
+		if (bool_IsCsvFormat) { //CVS format
 			
 			//delete old file if exists
 			File oldFile = new File(dir + 
 									File.separator + 
-									sFileNamePrefix + 
-									sFileNameSurfix);
+									string_FileNamePrefix + 
+									string_FileNameSurfix);
 			if(oldFile.exists()) {
 				oldFile.delete();
 			}
@@ -279,12 +312,12 @@ public class ManageContacts extends Activity {
 			try {
 				File file = new File(dir + 
 									 File.separator + 
-									 sFileNamePrefix + 
-									 sFileNameSurfix);
+									 string_FileNamePrefix + 
+									 string_FileNameSurfix);
 				file.createNewFile();
 			  
 				if (!file.exists()) {
-					ShowDialog("Cannot create/override file on sdcard, exit");
+					showDialog("Cannot create/override file on sdcard, exit");
 					return;
 				} 
 				  
@@ -293,7 +326,7 @@ public class ManageContacts extends Activity {
 				f.write("Contact name,Phone number,Source".getBytes());
 				f.write("\r\n".getBytes());
 			   
-				for(Contact Contact_OneContact: arContacts) {
+				for(Contact Contact_OneContact: arrayList_Contacts) {
 					//CVS file (semicolon separate)
 					f.write(Contact_OneContact.getName().getBytes());
 					f.write(",".getBytes());
@@ -305,24 +338,24 @@ public class ManageContacts extends Activity {
 				f.flush();
 				f.close();
 			} catch (IOException e) {
-				ShowDialog("Error during writing file on SD card, exit");
+				showDialog("Error during writing file on SD card, exit");
 				e.printStackTrace();
 			} finally {
 				TextView_Result.setText("Export done successfull!\r\n(Output file is in\r\n" + 
 										dir.toString() + "/ "+
-										sFileNamePrefix + 
-										sFileNameSurfix + 
+										string_FileNamePrefix + 
+										string_FileNameSurfix + 
 										")");
-				ShowDialog("Export done successfull! (" + 
+				showDialog("Export done successfull! (" + 
 						   dir.toString() + "/"+
-						   sFileNamePrefix + 
-						   sFileNameSurfix + 
+						   string_FileNamePrefix + 
+						   string_FileNameSurfix + 
 						   ")");
 			}
 		} else { //VCF format		
 			try {	
 				Integer noContact = 1;
-				for (Contact Contact_OneContact: arContacts) {
+				for (Contact Contact_OneContact: arrayList_Contacts) {
 					String fileName = dir + 
 							      	  File.separator + 
 							      	  (noContact++).toString() + 
@@ -371,14 +404,14 @@ public class ManageContacts extends Activity {
 					file = null;
 				}				
 			} catch (IOException e) {
-				ShowDialog("Error during writing file on SD card, exit");
+				showDialog("Error during writing file on SD card, exit");
 				e.printStackTrace();
 			} finally {
 				TextView_Result.setText("Export done successfull!\r\n(Output files is in /sdcard/ManageContacts/" + 
 										"*.vcf" +
 										")");
 
-				ShowDialog("Export done successfull! (check file " + 
+				showDialog("Export done successfull! (check file " + 
 						   "/sdcard/ManageContacts/ " + 
 						   "*.vcf" +
 						   " on you sdcard");
