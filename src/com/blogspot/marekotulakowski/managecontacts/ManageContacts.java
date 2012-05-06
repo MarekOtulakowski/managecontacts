@@ -1,5 +1,5 @@
 /*
- * build 003
+ * build 007
  */
 package com.blogspot.marekotulakowski.managecontacts;
 
@@ -37,6 +37,7 @@ public class ManageContacts extends Activity {
 	private Contact newContact; 
 	private String sFileNamePrefix = "ExportContacts";
 	private String sFileNameSurfix = ".cvs";
+	private Boolean IsCsvFormat = true;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,12 +54,40 @@ public class ManageContacts extends Activity {
         //assign events
         this.Button_Import.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	ShowDialog("clicked import button!");
+            	ShowDialog("clicked import button!\nNot implemed function, yet!");
             }
         });
         this.Button_Export.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	ShowDialog("clicked export button!");
+            public void onClick(View v) {     
+            	
+            	//user choose output format
+            	if (Spinner_KindOfContacts.getSelectedItemPosition() == 0) {
+            		IsCsvFormat = true; //CSV, default value
+            	} else if (Spinner_KindOfContacts.getSelectedItemPosition() == 1) {
+            		IsCsvFormat = false; //VCF
+            	} 
+            	
+            	//run selected function
+            	if (IsCsvFormat) {
+            		
+            		try {
+            			writeContactsToSdCard(SourceContact.SIMandAndroid);
+            		}
+            		catch (Exception e) {
+            			TextView_Result.setText("Export to CVS unsuccessfully completed!");
+            			ShowDialog("Error export, detail:\n" + e.getMessage());
+            		}
+
+            	} else {
+            		
+            		try {
+            			writeContactsToSdCard(SourceContact.SIMandAndroid);
+            		}
+            		catch (Exception e) {
+            			TextView_Result.setText("Export to VCF unsuccessfully completed!");
+            			ShowDialog("Error export, detail:\n" + e.getMessage());
+            		}
+            	}
             }
         });
         this.Button_Close.setOnClickListener(new View.OnClickListener() {
@@ -229,48 +258,131 @@ public class ManageContacts extends Activity {
 		}
 			 
 		File sdCard = Environment.getExternalStorageDirectory(); 
-		File dir = new File (sdCard.getAbsolutePath() + ""); 
+		File dir = new File (sdCard.getAbsolutePath() + 
+							 File.separator + 
+							 "ManageContacts"); 
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
-			 
-		try {
-			File file = new File(dir + "/" + sFileNamePrefix + sFileNameSurfix);
-			file.createNewFile();
-		  
-			if (!file.exists()) {
-				ShowDialog("Cannot create/override file on sdcard, exit");
-				return;
-			} 
-			  
-			FileOutputStream f = new FileOutputStream(file);
-			//header in CVS file
-			f.write("Contact name,Phone number,Source".getBytes());
-			f.write("\r\n".getBytes());
-		   
-			for(Contact Contact_OneContact: arContacts) {
-				//CVS file (semicolon separate)
-				f.write(Contact_OneContact.getName().getBytes());
-				f.write(",".getBytes());
-				f.write(Contact_OneContact.getPhoneNumber().getBytes());
-				f.write(",".getBytes());
-				f.write(Contact_OneContact.getTypeContact().toString().getBytes());
-				f.write("\r\n".getBytes());
-			}
-			f.flush();
-			f.close();
-		} catch (IOException e) {
-			ShowDialog("Error during writing file on SD card, exit");
-			e.printStackTrace();
-		} finally {
-			TextView_Result.setText("Export done successfull!\r\n(Output file is in /sdcard/" + 
+		
+		if (IsCsvFormat) { //CVS format
+			
+			//delete old file if exists
+			File oldFile = new File(dir + 
+									File.separator + 
 									sFileNamePrefix + 
-									sFileNameSurfix + 
-									")");
-			ShowDialog("Export done successfull! (check file " + 
-					    sFileNamePrefix + 
-						sFileNameSurfix + 
-						" on you sdcard");
+									sFileNameSurfix);
+			if(oldFile.exists()) {
+				oldFile.delete();
+			}
+			
+			try {
+				File file = new File(dir + 
+									 File.separator + 
+									 sFileNamePrefix + 
+									 sFileNameSurfix);
+				file.createNewFile();
+			  
+				if (!file.exists()) {
+					ShowDialog("Cannot create/override file on sdcard, exit");
+					return;
+				} 
+				  
+				FileOutputStream f = new FileOutputStream(file);
+				//header in CVS file
+				f.write("Contact name,Phone number,Source".getBytes());
+				f.write("\r\n".getBytes());
+			   
+				for(Contact Contact_OneContact: arContacts) {
+					//CVS file (semicolon separate)
+					f.write(Contact_OneContact.getName().getBytes());
+					f.write(",".getBytes());
+					f.write(Contact_OneContact.getPhoneNumber().getBytes());
+					f.write(",".getBytes());
+					f.write(Contact_OneContact.getTypeContact().toString().getBytes());
+					f.write("\r\n".getBytes());
+				}
+				f.flush();
+				f.close();
+			} catch (IOException e) {
+				ShowDialog("Error during writing file on SD card, exit");
+				e.printStackTrace();
+			} finally {
+				TextView_Result.setText("Export done successfull!\r\n(Output file is in\r\n" + 
+										dir.toString() + "/ "+
+										sFileNamePrefix + 
+										sFileNameSurfix + 
+										")");
+				ShowDialog("Export done successfull! (" + 
+						   dir.toString() + "/"+
+						   sFileNamePrefix + 
+						   sFileNameSurfix + 
+						   ")");
+			}
+		} else { //VCF format		
+			try {	
+				Integer noContact = 1;
+				for (Contact Contact_OneContact: arContacts) {
+					String fileName = dir + 
+							      	  File.separator + 
+							      	  (noContact++).toString() + 
+							      	  ".vcf";
+					File file = new File(fileName);
+					if (file.exists()) file.delete();
+					file.createNewFile();				  
+					FileOutputStream f = new FileOutputStream(file);
+					
+					//header in VCF file
+					f.write("BEGIN:VCARD".getBytes());
+					f.write("\r\n".getBytes());
+					f.write("VERSION:2.1".getBytes());
+					f.write("\r\n".getBytes());
+					
+					//body in VCF file
+					f.write("N:".getBytes());
+					f.write(Contact_OneContact.getName().getBytes());
+					f.write(";;;;".getBytes());
+					
+					f.write("\r\n".getBytes());
+					
+					f.write("FN:".getBytes());
+					f.write(Contact_OneContact.getName().getBytes());
+					f.write("\r\n".getBytes());
+					
+					f.write("TEL".getBytes());
+					f.write(";".getBytes());
+					
+					f.write("CELL:".getBytes());
+					f.write(Contact_OneContact.getPhoneNumber().getBytes());
+					f.write("\r\n".getBytes());
+					
+					f.write("EMAIL;HOME".getBytes());
+					f.write("\r\n".getBytes());
+					
+					//footer in VCF file
+					f.write("END:VCARD".getBytes());
+					f.write("\r\n".getBytes());
+					
+					//blank line
+					f.write("\r\n".getBytes());
+					
+					f.flush();
+					f.close();
+					file = null;
+				}				
+			} catch (IOException e) {
+				ShowDialog("Error during writing file on SD card, exit");
+				e.printStackTrace();
+			} finally {
+				TextView_Result.setText("Export done successfull!\r\n(Output files is in /sdcard/ManageContacts/" + 
+										"*.vcf" +
+										")");
+
+				ShowDialog("Export done successfull! (check file " + 
+						   "/sdcard/ManageContacts/ " + 
+						   "*.vcf" +
+						   " on you sdcard");
+			}
 		}
     }
 }
