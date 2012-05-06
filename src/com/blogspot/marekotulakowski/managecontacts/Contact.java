@@ -1,5 +1,5 @@
 /*
- * build 007
+ * build 008
  */
 package com.blogspot.marekotulakowski.managecontacts;
 
