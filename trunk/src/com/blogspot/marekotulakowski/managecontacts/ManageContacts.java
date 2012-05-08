@@ -1,5 +1,5 @@
 /*
- * build 008
+ * build 009
  */
 package com.blogspot.marekotulakowski.managecontacts;
 
@@ -58,6 +58,9 @@ public class ManageContacts extends Activity {
         this.Button_Import.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	showDialog("clicked import button!\nNot implemed function, yet!");
+            	
+            	writeContactsToPhone();
+            	//showDialog("success add new contact!");
             }
         });
         this.Button_Export.setOnClickListener(new View.OnClickListener() {
@@ -268,6 +271,22 @@ ArrayAdapter<String> spinnerAdapterContactSource = new ArrayAdapter<String>(this
 		  
 		return arContactFromSIM;  
 	}  
+    
+    private void writeContactsToPhone() {
+    	
+    	/*
+    	Intent intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, Uri.parse("tel:" + "0123456789"));
+    	intent.putExtra(ContactsContract.Intents.Insert.NAME, "New Contact");
+    	intent.putExtra(ContactsContract.Intents.Insert.NOTES, "Notes");
+    	intent.putExtra(ContactsContract.Intents.Insert.FULL_MODE, "Full Name");
+    	intent.putExtra(ContactsContract.Intents.Insert.EMAIL, "nick@domain.com");
+    	intent.putExtra(ContactsContract.Intents.Insert.PHONE, "0123456789");
+    	intent.putExtra(ContactsContract.Intents.EXTRA_FORCE_CREATE, true);
+    	startActivity(intent);
+    	setResult(RESULT_OK); */
+    	
+    	//to fix above code, always display confirm for user (edit new contact "done" and "revert")
+    }
 	
     private void writeContactsToSdCard(SourceContact sourceContact) { 
 		arrayList_Contacts = new ArrayList<Contact>();
