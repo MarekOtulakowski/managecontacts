@@ -5,7 +5,3 @@ Android appliction to export and import any contacts from Android (and SIM card)
 
 # managecontacts
 Automatically exported from code.google.com/p/managecontacts
-
-# Build version and description
-Download from links 
-https://github.com/MarekOtulakowski/managecontacts/wiki/Download-build-files
